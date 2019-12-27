@@ -1,0 +1,5 @@
+package vendor.goodix.hardware.biometrics.fingerprint@2.1;
+
+interface IGoodixFingerprintDaemon {
+    sendCommand(int32_t cmd, vec<int8_t> data) generates (int32_t resultCode, vec<int8_t> data);
+};
