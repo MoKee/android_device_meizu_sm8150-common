@@ -38,6 +38,10 @@ PRODUCT_PACKAGES += \
     audio.a2dp.default \
     libaacwrapper
 
+# Camera
+PRODUCT_PACKAGES += \
+    Snap
+
 # Display
 PRODUCT_PACKAGES += \
     libdisplayconfig \
