@@ -45,6 +45,10 @@ PRODUCT_PACKAGES += \
     libvulkan \
     vendor.display.config@1.0
 
+# Fingerprint
+PRODUCT_PACKAGES += \
+    mokee.biometrics.fingerprint.inscreen@1.0-service.meizu_sm8150
+
 # Init
 PRODUCT_PACKAGES += \
     init.qcom.rc
