@@ -1,0 +1,4 @@
+service touch-hal-1-0-meizu_sm8150 /system/bin/hw/mokee.touch@1.0-service.meizu_sm8150
+    class hal
+    user system
+    group system
