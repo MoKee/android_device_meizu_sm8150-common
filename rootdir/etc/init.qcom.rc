@@ -1,1 +1,5 @@
 import /init.target.rc
+
+on post-fs
+    mount none /system/lib/hw/android.hardware.power@1.0-impl.meizu_sm8150.so /vendor/lib/hw/android.hardware.power@1.0-impl.so bind
+    mount none /system/lib64/hw/android.hardware.power@1.0-impl.meizu_sm8150.so /vendor/lib64/hw/android.hardware.power@1.0-impl.so bind
