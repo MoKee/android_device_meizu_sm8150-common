@@ -25,6 +25,7 @@
 
 #include "PictureAdjustment.h"
 #include "SunlightEnhancement.h"
+#include "FlickerFree.h"
 
 constexpr const char* SDM_DISP_LIBS[]{
     "libsdm-disp-apis.qti.so",
@@ -41,6 +42,7 @@ using ::vendor::mokee::livedisplay::V2_0::IPictureAdjustment;
 using ::vendor::mokee::livedisplay::V2_0::ISunlightEnhancement;
 using ::vendor::mokee::livedisplay::V2_0::sdm::PictureAdjustment;
 using ::vendor::mokee::livedisplay::V2_0::sysfs::SunlightEnhancement;
+using ::vendor::mokee::livedisplay::V2_0::sysfs::FlickerFree;
 
 int main() {
     // Vendor backend
@@ -53,6 +55,7 @@ int main() {
     // HIDL frontend
     sp<PictureAdjustment> pa;
     sp<SunlightEnhancement> se;
+    sp<FlickerFree> ff;
 
     status_t status = OK;
 
@@ -110,6 +113,13 @@ int main() {
         goto shutdown;
     }
 
+    ff = new FlickerFree();
+    if (ff == nullptr) {
+        LOG(ERROR)
+            << "Can not create an instance of LiveDisplay HAL FlickerFree Iface, exiting.";
+        goto shutdown;
+    }
+
     if (!pa->isSupported()) {
         // Backend isn't ready yet, so restart and try again
         goto shutdown;
@@ -130,6 +140,15 @@ int main() {
         status = se->registerAsService();
         if (status != OK) {
             LOG(ERROR) << "Could not register service for LiveDisplay HAL SunlightEnhancement Iface"
+                       << " (" << status << ")";
+            goto shutdown;
+        }
+    }
+
+    if (ff->isSupported()) {
+        status = ff->registerAsService();
+        if (status != OK) {
+            LOG(ERROR) << "Could not register service for LiveDisplay HAL FlickerFree Iface"
                        << " (" << status << ")";
             goto shutdown;
         }

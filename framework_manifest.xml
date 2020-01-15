@@ -20,6 +20,10 @@
             <name>ISunlightEnhancement</name>
             <instance>default</instance>
         </interface>
+        <interface>
+            <name>IFlickerFree</name>
+            <instance>default</instance>
+        </interface>
     </hal>
     <hal format="hidl">
         <name>vendor.mokee.touch</name>
