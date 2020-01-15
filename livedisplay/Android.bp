@@ -21,6 +21,7 @@ cc_binary {
     srcs: [
         "PictureAdjustment.cpp",
         "SunlightEnhancement.cpp",
+        "FlickerFree.cpp",
         "Utils.cpp",
         "service.cpp",
     ],
