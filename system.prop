@@ -194,3 +194,7 @@ persist.vendor.sensors.enable.mag_filter=true
 # network location provider is not functional
 ro.location.osnlp.package=com.google.android.gms
 ro.location.osnlp.region.package=
+
+# VoLTE
+persist.dbg.volte_avail_ovr=1
+persist.dbg.vt_avail_ovr=1
