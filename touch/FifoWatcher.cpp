@@ -15,6 +15,9 @@
 
 #include <fcntl.h>
 #include <sys/stat.h>
+#include <sys/epoll.h>
+
+#define EPOLLEVENTS 20
 
 namespace vendor {
 namespace mokee {
@@ -40,6 +43,9 @@ void FifoWatcher::exit() {
 }
 
 static void *work(void *arg) {
+    int epoll_fd, input_fd;
+    struct epoll_event ev;
+    int nevents = 0;
     int fd, len, value;
     char buf[10];
 
@@ -55,33 +61,62 @@ static void *work(void *arg) {
         return NULL;
     }
 
-    fd = open(file, O_RDONLY);
-    if (fd < 0) {
+    input_fd = open(file, O_RDONLY);
+    if (input_fd < 0) {
         LOG(ERROR) << "Failed opening " << thiz->mFile << ": " << errno;
         return NULL;
     }
 
+    ev.events = EPOLLIN;
+    ev.data.fd = input_fd;
+
+    epoll_fd = epoll_create(EPOLLEVENTS);
+    if (epoll_fd == -1) {
+        LOG(ERROR) << "Failed epoll_create: " << errno;
+        goto error;
+    }
+
+    if (epoll_ctl(epoll_fd, EPOLL_CTL_ADD, input_fd, &ev) == -1) {
+        LOG(ERROR) << "Failed epoll_ctl: " << errno;
+        goto error;
+    }
+
     while (!thiz->mExit) {
-        len = read(fd, buf, sizeof(buf));
-        if (len < 0) {
-            LOG(ERROR) << "Failed reading " << thiz->mFile << ": " << errno;
-            goto error;
-        } else if (len == 0) {
-            continue;
+        struct epoll_event events[EPOLLEVENTS];
+
+        nevents = epoll_wait(epoll_fd, events, EPOLLEVENTS, -1);
+        if (nevents == -1) {
+            if (errno == EINTR) {
+                continue;
+            }
+            LOG(ERROR) << "Failed epoll_wait: " << errno;
+            break;
         }
 
-        len = sscanf(buf, "%d", &value);
-        if (len != 1) {
-            continue;
-        }
+        for (int i = 0; i < nevents; i++) {
+            fd = events[i].data.fd;
+            len = read(fd, buf, sizeof(buf));
+            if (len < 0) {
+                LOG(ERROR) << "Failed reading " << thiz->mFile << ": " << errno;
+                goto error;
+            } else if (len == 0) {
+                usleep(10 * 1000);
+                continue;
+            }
 
-        thiz->mCallback(thiz->mFile, value);
+            value = atoi(buf);
+
+            thiz->mCallback(thiz->mFile, value);
+        }
     }
 
     LOG(INFO) << "Exiting worker thread";
 
 error:
-    close(fd);
+    close(input_fd);
+
+    if (epoll_fd >= 0)
+        close(epoll_fd);
 
     return NULL;
 }
