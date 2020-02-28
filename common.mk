@@ -9,6 +9,11 @@ $(call inherit-product, vendor/meizu/sm8150-common/sm8150-common-vendor.mk)
 # Overlays
 DEVICE_PACKAGE_OVERLAYS += $(LOCAL_PATH)/overlay-mokee
 
+DEVICE_PACKAGE_OVERLAYS += $(LOCAL_PATH)/overlay-device
+PRODUCT_PACKAGE_OVERLAYS +=  $(LOCAL_PATH)/overlay-product
+
+DEVICE_PACKAGE_OVERLAYS += $(LOCAL_PATH)/overlay-msmnile
+
 # Properties
 -include $(LOCAL_PATH)/vendor_prop.mk
 
@@ -146,6 +151,9 @@ PRODUCT_PACKAGES += \
     libgps.utils \
     libloc_core \
     liblocation_api
+
+PRODUCT_COPY_FILES += \
+    $(call find-copy-subdir-files,*,$(LOCAL_PATH)/gps/etc,$(TARGET_COPY_OUT_VENDOR)/etc)
 
 # Health
 PRODUCT_PACKAGES += \
