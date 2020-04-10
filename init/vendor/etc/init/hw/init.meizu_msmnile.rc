@@ -27,6 +27,24 @@ on init
     mkdir /data/awinic 0770 system audio
     #@}
 
+# service logdumpd /system/bin/logcat -b all -f /dev/block/sde54
+#     user root
+#     group root
+#     disabled
+
+service xxdebug /vendor/bin/sh /vendor/bin/xxdebug.sh
+    user root
+    group root
+    disabled
+
+on post-fs
+    write /dev/block/sde54 hello
+    # start logdumpd
+    # write /sys/class/leds/breath/brightness 255
+
+on post-fs
+    start xxdebug
+
 on post-fs-data
     #huangxiaotao@System.Setting add for lut mode{@
     chown system system /sys/class/meizu/lcm/display/lut
